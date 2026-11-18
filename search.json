@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "2026 North Carolina State Senate Election Results",
     "section": "",
-    "text": "This map displays the results of the November 2026 North Carolina State Senate elections across all 50 legislative districts. Districts shaded in blue were won by Democrats and districts in red were won by Republicans, with darker shading indicating larger margins of victory."
+    "text": "An analysis of the November 2026 North Carolina State Senate legislative election across all 50 districts.\n\nIn the 2026 general election, control of the North Carolina State Senate was closely contested. Out of the 50 total senate seats, Republicans won 26 seats and Democrats won 24 seats.\nThe map below illustrates each district’s election outcome. Districts are shaded by the margin of victory, with blue indicating Democratic victories and red indicating Republican victories."
   },
   {
     "objectID": "about.html",
@@ -26,5 +26,19 @@
     "title": "About",
     "section": "What It Takes to Win Statewide in North Carolina",
     "text": "What It Takes to Win Statewide in North Carolina\nWinning a statewide race in North Carolina generally requires balancing three key geographic and demographic dynamics:\n\nUrban and Suburban Margins: Candidates from the Democratic coalition typically rely on running up large voter margins in high-density population centers such as Mecklenburg County (Charlotte), Wake County (Raleigh), and the Research Triangle.\nRural and Exurban Strength: Candidates from the Republican coalition generally rely on strong turnout and commanding victory margins across North Carolina’s rural and small-town counties.\nWinning Unaffiliated Voters: Unaffiliated voters make up the largest and fastest-growing group of registered voters in North Carolina. Any successful statewide candidate must appeal to moderate swing voters outside the party bases."
+  },
+  {
+    "objectID": "about.html#data-sources",
+    "href": "about.html#data-sources",
+    "title": "About",
+    "section": "Data Sources",
+    "text": "Data Sources\n\nElection Results: Official precinct returns published by the North Carolina State Board of Elections (NCSBE).\nGeographic Boundaries: Cartographic boundary shapefiles provided by the U.S. Census Bureau via the tigris R package."
+  },
+  {
+    "objectID": "senate-history.html",
+    "href": "senate-history.html",
+    "title": "North Carolina Senate History: Female vs. Male Matchups",
+    "section": "",
+    "text": "Exploring electoral patterns in North Carolina statewide races featuring a female candidate running against a male candidate.\n\nIn North Carolina electoral history, several high-profile U.S. Senate races have featured a female candidate facing a male opponent. Most recently in 2022, former North Carolina Supreme Court Chief Justice Cheri Beasley (Democrat) became the first Black woman nominated for U.S. Senate in the state, running against Ted Budd (Republican).\nThe interactive map below allows you to compare county-level outcomes in the 2022 woman-vs-man contest against the 2026 contest. Use the layer selector in the top-right corner to toggle between elections, and hover over any county to inspect candidate vote shares and victory margins."
   }
 ]
