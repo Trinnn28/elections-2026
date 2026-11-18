@@ -2,15 +2,29 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Elections 2026",
+    "title": "2026 North Carolina State Senate Election Results",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
+    "text": "This map displays the results of the November 2026 North Carolina State Senate elections across all 50 legislative districts. Districts shaded in blue were won by Democrats and districts in red were won by Republicans, with darker shading indicating larger margins of victory."
   },
   {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this site"
+    "text": "Unlike congressional or state legislative elections that are decided by specific districts, U.S. Senate races in North Carolina are statewide contests. Every registered voter in all 100 counties casts a ballot in the same race.\nNorth Carolina is one of the nation’s premier battleground states, characterized by closely divided statewide results between Democrats and Republicans."
+  },
+  {
+    "objectID": "about.html#u.s.-senate-elections-in-north-carolina",
+    "href": "about.html#u.s.-senate-elections-in-north-carolina",
+    "title": "About",
+    "section": "",
+    "text": "Unlike congressional or state legislative elections that are decided by specific districts, U.S. Senate races in North Carolina are statewide contests. Every registered voter in all 100 counties casts a ballot in the same race.\nNorth Carolina is one of the nation’s premier battleground states, characterized by closely divided statewide results between Democrats and Republicans."
+  },
+  {
+    "objectID": "about.html#what-it-takes-to-win-statewide-in-north-carolina",
+    "href": "about.html#what-it-takes-to-win-statewide-in-north-carolina",
+    "title": "About",
+    "section": "What It Takes to Win Statewide in North Carolina",
+    "text": "What It Takes to Win Statewide in North Carolina\nWinning a statewide race in North Carolina generally requires balancing three key geographic and demographic dynamics:\n\nUrban and Suburban Margins: Candidates from the Democratic coalition typically rely on running up large voter margins in high-density population centers such as Mecklenburg County (Charlotte), Wake County (Raleigh), and the Research Triangle.\nRural and Exurban Strength: Candidates from the Republican coalition generally rely on strong turnout and commanding victory margins across North Carolina’s rural and small-town counties.\nWinning Unaffiliated Voters: Unaffiliated voters make up the largest and fastest-growing group of registered voters in North Carolina. Any successful statewide candidate must appeal to moderate swing voters outside the party bases."
   }
 ]
