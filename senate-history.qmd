@@ -11,131 +11,87 @@ execute:
 Exploring electoral patterns in North Carolina statewide races featuring a female candidate running against a male candidate.
 :::
 
-In North Carolina electoral history, several high-profile U.S. Senate races have featured a female candidate facing a male opponent. Most recently in **2022**, former North Carolina Supreme Court Chief Justice **Cheri Beasley** (Democrat) became the first Black woman nominated for U.S. Senate in the state, running against **Ted Budd** (Republican).
+In North Carolina electoral history, several high-profile U.S. Senate races have featured a female candidate facing a male opponent. Most notably in **2022**, former North Carolina Supreme Court Chief Justice **Cheri Beasley** (Democrat) became the first Black woman nominated for U.S. Senate in the state, running against **Ted Budd** (Republican).
 
-The interactive map below allows you to compare county-level outcomes in the **2022 woman-vs-man contest** against the **2026 contest**. Use the layer selector in the top-right corner to toggle between elections, and hover over any county to inspect candidate vote shares and victory margins.
+The animated map below uses `gganimate` to cycle back and forth between the **2022 woman-vs.-man matchup** and the **2026 election**, illustrating county-by-county shifts in vote margin across North Carolina.
 
 ```{r}
 library(tidyverse)
 library(sf)
 library(tigris)
-library(leaflet)
-library(htmltools)
+library(gganimate)
 
 options(tigris_use_cache = TRUE)
 
-# 1. Download and process 2022 U.S. Senate results (Cheri Beasley vs Ted Budd)
+# 1. 2022 Results: Cheri Beasley (Woman / D) vs Ted Budd (Man / R)
 url_2022 <- "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2022_11_08/results_pct_20221108.zip"
 temp22 <- tempfile(fileext = ".zip")
 download.file(url_2022, temp22, quiet = TRUE)
 raw22 <- read_tsv(unz(temp22, "results_pct_20221108.txt"), show_col_types = FALSE)
 
-margin_2022 <- raw22 |>
-  filter(`Contest Name` == "US SENATE") |>
+m22 <- raw22 |>
+  filter(`Contest Name` == "US SENATE", Choice %in% c("Cheri Beasley", "Ted Budd")) |>
   group_by(County, Choice) |>
   summarize(votes = sum(`Total Votes`), .groups = "drop") |>
-  filter(Choice %in% c("Cheri Beasley", "Ted Budd")) |>
   pivot_wider(names_from = Choice, values_from = votes, values_fill = 0) |>
   mutate(
-    total_22 = `Cheri Beasley` + `Ted Budd`,
-    beasley_pct = round(`Cheri Beasley` / total_22 * 100, 1),
-    budd_pct = round(`Ted Budd` / total_22 * 100, 1),
-    margin_2022 = round(beasley_pct - budd_pct, 1),
-    county_upper = toupper(County)
-  )
+    total = `Cheri Beasley` + `Ted Budd`,
+    dem_margin = (`Cheri Beasley` - `Ted Budd`) / total * 100,
+    county_upper = toupper(County),
+    election = "2022: Cheri Beasley (Woman / D) vs. Ted Budd (Man / R)"
+  ) |>
+  select(county_upper, election, dem_margin)
 
-# 2. Download and process 2026 U.S. Senate results (Roy Cooper vs Michael Whatley)
+# 2. 2026 Results: Roy Cooper (Man / D) vs Michael Whatley (Man / R)
 url_2026 <- "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2026_11_03/results_pct_20261103.zip"
 temp26 <- tempfile(fileext = ".zip")
 download.file(url_2026, temp26, quiet = TRUE)
 raw26 <- read_tsv(unz(temp26, "results_pct_20261103.txt"), show_col_types = FALSE)
 
-margin_2026 <- raw26 |>
-  filter(`Contest Name` == "US SENATE") |>
+m26 <- raw26 |>
+  filter(`Contest Name` == "US SENATE", Choice %in% c("Roy Cooper", "Michael Whatley")) |>
   group_by(County, Choice) |>
   summarize(votes = sum(`Total Votes`), .groups = "drop") |>
-  filter(Choice %in% c("Roy Cooper", "Michael Whatley")) |>
   pivot_wider(names_from = Choice, values_from = votes, values_fill = 0) |>
   mutate(
-    total_26 = `Roy Cooper` + `Michael Whatley`,
-    cooper_pct = round(`Roy Cooper` / total_26 * 100, 1),
-    whatley_pct = round(`Michael Whatley` / total_26 * 100, 1),
-    margin_2026 = round(cooper_pct - whatley_pct, 1),
-    county_upper = toupper(County)
-  )
+    total = `Roy Cooper` + `Michael Whatley`,
+    dem_margin = (`Roy Cooper` - `Michael Whatley`) / total * 100,
+    county_upper = toupper(County),
+    election = "2026: Roy Cooper (Man / D) vs. Michael Whatley (Man / R)"
+  ) |>
+  select(county_upper, election, dem_margin)
 
-# 3. Download county boundaries and join election datasets
+# 3. Combine both elections and join with NC county boundaries
+combined <- bind_rows(m22, m26)
+
 nc_counties <- counties(state = "NC", cb = TRUE, progress_bar = FALSE) |>
-  st_transform(crs = 4326) |>
   mutate(county_upper = toupper(NAME)) |>
-  left_join(margin_2022, by = "county_upper") |>
-  left_join(margin_2026, by = "county_upper")
+  inner_join(combined, by = "county_upper")
 
-# Color palette for Democratic vs Republican margin
-bins <- c(-80, -40, -20, -5, 5, 20, 40, 80)
-pal <- colorBin(
-  palette = c("#ca0020", "#f4a582", "#fddbc7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac"),
-  domain = c(-80, 80),
-  bins = bins
-)
+# 4. Animated map cycling between the two elections
+p <- ggplot(nc_counties) +
+  geom_sf(aes(fill = dem_margin), color = "white", linewidth = 0.2) +
+  scale_fill_gradient2(
+    low = "#ca0020",
+    mid = "#f7f7f7",
+    high = "#0571b0",
+    midpoint = 0,
+    limits = c(-80, 80),
+    name = "Margin (%)",
+    labels = \(x) paste0(ifelse(x > 0, "+", ""), round(x), "%")
+  ) +
+  labs(
+    title = "{closest_state}",
+    subtitle = "Comparing North Carolina US Senate Vote Margins",
+    caption = "Source: North Carolina State Board of Elections"
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 11, color = "gray30"),
+    legend.position = "bottom"
+  ) +
+  transition_states(election, transition_length = 1, state_length = 3)
 
-# Interactive hover labels for both years
-labels_2022 <- sprintf(
-  "<strong>%s County (2022)</strong><br/>
-   Cheri Beasley (Woman / Dem): %s%% (%s votes)<br/>
-   Ted Budd (Man / Rep): %s%% (%s votes)<br/>
-   <strong>Margin:</strong> %s%%",
-  nc_counties$NAME,
-  nc_counties$beasley_pct, scales::comma(nc_counties$`Cheri Beasley`),
-  nc_counties$budd_pct, scales::comma(nc_counties$`Ted Budd`),
-  ifelse(nc_counties$margin_2022 > 0, paste0("+", nc_counties$margin_2022), nc_counties$margin_2022)
-) |> lapply(HTML)
-
-labels_2026 <- sprintf(
-  "<strong>%s County (2026)</strong><br/>
-   Roy Cooper (Man / Dem): %s%% (%s votes)<br/>
-   Michael Whatley (Man / Rep): %s%% (%s votes)<br/>
-   <strong>Margin:</strong> %s%%",
-  nc_counties$NAME,
-  nc_counties$cooper_pct, scales::comma(nc_counties$`Roy Cooper`),
-  nc_counties$whatley_pct, scales::comma(nc_counties$`Michael Whatley`),
-  ifelse(nc_counties$margin_2026 > 0, paste0("+", nc_counties$margin_2026), nc_counties$margin_2026)
-) |> lapply(HTML)
-
-# 4. Interactive comparative Leaflet map
-leaflet(nc_counties, height = 550) |>
-  addProviderTiles(providers$CartoDB.Positron) |>
-  addPolygons(
-    group = "2022: Woman vs Man (Beasley vs Budd)",
-    fillColor = ~pal(margin_2022),
-    weight = 1,
-    opacity = 1,
-    color = "white",
-    fillOpacity = 0.75,
-    highlightOptions = highlightOptions(weight = 2, color = "#333", fillOpacity = 0.95, bringToFront = TRUE),
-    label = labels_2022
-  ) |>
-  addPolygons(
-    group = "2026: Man vs Man (Cooper vs Whatley)",
-    fillColor = ~pal(margin_2026),
-    weight = 1,
-    opacity = 1,
-    color = "white",
-    fillOpacity = 0.75,
-    highlightOptions = highlightOptions(weight = 2, color = "#333", fillOpacity = 0.95, bringToFront = TRUE),
-    label = labels_2026
-  ) |>
-  addLayersControl(
-    baseGroups = c(
-      "2022: Woman vs Man (Beasley vs Budd)",
-      "2026: Man vs Man (Cooper vs Whatley)"
-    ),
-    options = layersControlOptions(collapsed = FALSE)
-  ) |>
-  addLegend(
-    pal = pal,
-    values = c(-80, 80),
-    title = "Democratic Margin (%)",
-    position = "bottomright"
-  )
+animate(p, nframes = 20, fps = 4, width = 7.5, height = 4.5, units = "in", res = 100)
 ```
