@@ -1,0 +1,72 @@
+---
+title: "2026 North Carolina State Senate Election Results"
+author: "Trinity Harden"
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+This map displays the results of the November 2026 North Carolina State Senate elections across all 50 legislative districts. Districts shaded in blue were won by Democrats and districts in red were won by Republicans, with darker shading indicating larger margins of victory.
+
+```{r}
+library(tidyverse)
+library(sf)
+library(tigris)
+
+options(tigris_use_cache = TRUE)
+
+# 1. Download and read November 2026 results
+url <- "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2026_11_03/results_pct_20261103.zip"
+temp <- tempfile(fileext = ".zip")
+download.file(url, temp, quiet = TRUE)
+raw <- read_tsv(unz(temp, "results_pct_20261103.txt"), show_col_types = FALSE)
+
+# 2. Filter for NC State Senate contests and compute margin by district
+senate_dist <- raw |>
+  filter(str_detect(`Contest Name`, "^NC STATE SENATE")) |>
+  mutate(district_num = str_extract(`Contest Name`, "\\d+")) |>
+  group_by(district_num, `Choice Party`) |>
+  summarize(votes = sum(`Total Votes`), .groups = "drop") |>
+  pivot_wider(names_from = `Choice Party`, values_from = votes, values_fill = 0) |>
+  mutate(
+    total = DEM + REP,
+    dem_margin = (DEM - REP) / total * 100,
+    winner = ifelse(DEM > REP, "Democrat", "Republican"),
+    district_id = sprintf("%03d", as.integer(district_num))
+  )
+
+# 3. Get NC State Senate district shapefiles and join results
+districts_sf <- state_legislative_districts(
+  state = "NC",
+  house = "upper",
+  cb = TRUE,
+  progress_bar = FALSE
+) |>
+  left_join(senate_dist, by = c("SLDUST" = "district_id"))
+
+# 4. Plot map of NC State Senate results
+ggplot(districts_sf) +
+  geom_sf(aes(fill = dem_margin), color = "white", linewidth = 0.3) +
+  scale_fill_gradient2(
+    low = "#ca0020",
+    mid = "#f7f7f7",
+    high = "#0571b0",
+    midpoint = 0,
+    name = "Margin (%)",
+    labels = \(x) paste0(ifelse(x > 0, "+", ""), round(x), "%")
+  ) +
+  labs(
+    title = "2026 NC State Senate Results by District",
+    subtitle = "50 Seats Total: 26 Republican, 24 Democrat",
+    caption = "Source: North Carolina State Board of Elections"
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12, color = "gray30"),
+    legend.position = "bottom"
+  )
+```
+
+
