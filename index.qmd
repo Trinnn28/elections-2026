@@ -7,9 +7,18 @@ execute:
   message: false
 ---
 
-This map displays the results of the November 2026 North Carolina State Senate elections across all 50 legislative districts. Districts shaded in blue were won by Democrats and districts in red were won by Republicans, with darker shading indicating larger margins of victory.
+::: {.lead}
+An analysis of the November 2026 North Carolina State Senate legislative election across all 50 districts.
+:::
+
+In the 2026 general election, control of the North Carolina State Senate was closely contested. Out of the 50 total senate seats, **Republicans won 26 seats** and **Democrats won 24 seats**. 
+
+The map below illustrates each district's election outcome. Districts are shaded by the margin of victory, with blue indicating Democratic victories and red indicating Republican victories.
 
 ```{r}
+#| fig-width: 9
+#| fig-height: 5.5
+#| dpi: 300
 library(tidyverse)
 library(sf)
 library(tigris)

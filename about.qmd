@@ -17,3 +17,9 @@ Winning a statewide race in North Carolina generally requires balancing three ke
 2. **Rural and Exurban Strength:** Candidates from the Republican coalition generally rely on strong turnout and commanding victory margins across North Carolina's rural and small-town counties.
 3. **Winning Unaffiliated Voters:** Unaffiliated voters make up the largest and fastest-growing group of registered voters in North Carolina. Any successful statewide candidate must appeal to moderate swing voters outside the party bases.
 
+## Data Sources
+
+- **Election Results:** Official precinct returns published by the [North Carolina State Board of Elections (NCSBE)](https://www.ncsbe.gov/results-data/election-results/historical-election-results-data).
+- **Geographic Boundaries:** Cartographic boundary shapefiles provided by the U.S. Census Bureau via the [`tigris`](https://github.com/walkerke/tigris) R package.
+
+
